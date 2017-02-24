@@ -23,6 +23,7 @@ Program requires an `Input file` and an `Output file`.
 
 ###Input File
 Input file should be of the following format
+
 1. GridSize (0<M<10)
 2. Number of ships for each player
 3. Player 1 ship positions, should be of format x1,y1:x2,y2:x3,y3:x4,y4
