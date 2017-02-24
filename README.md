@@ -12,7 +12,11 @@ be given T number of missiles.
 
 
 ##Installation
-`go get github.com/vedhavyas/battleship/cmd/`
+```
+go get github.com/vedhavyas/battleship/battleship-start
+cd $GOPATH/bin
+./battleship-start --help
+```
 
 ##Input
 Program requires an `Input file` and an `Output file`.
