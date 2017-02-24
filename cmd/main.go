@@ -17,7 +17,7 @@ func main() {
 
 	var inputFile string
 	var outputFile string
-
+	log.SetFlags(log.Lshortfile)
 	flag.StringVar(&inputFile, "input-file", "", "Input file with game details.")
 	flag.StringVar(&outputFile, "output-file", "", "Output file to write result of the Game.")
 	flag.Parse()
@@ -40,7 +40,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Println(gameResult.Result)
+	fmt.Println(gameResult.Result)
 	err = writeGameResult(gameResult, outputFile)
 	if err != nil {
 		log.Fatal(err)

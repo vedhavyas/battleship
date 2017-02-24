@@ -2,6 +2,7 @@ package battleship
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -33,8 +34,8 @@ const (
 
 //location holds the x, y point of a specific location on board
 type location struct {
-	X int
-	Y int
+	x int
+	y int
 }
 
 //playerBoard is a depiction of the battle board of a player
@@ -83,7 +84,7 @@ type player struct {
 func (p *player) opponentMove(loc location) bool {
 	var isHit bool
 	newData := missedHit
-	x, y := loc.X, loc.Y
+	x, y := loc.x, loc.y
 	if p.board.boardRepresentation[x][y] == initialPosition {
 		isHit = true
 		newData = hit
@@ -150,11 +151,19 @@ func newPlayer(playerShipPositions, playerMoves string,
 		return nil, err
 	}
 
+	if len(shipPositions) != totalShips {
+		return nil, errors.New("Total ships and ship positions did not match")
+	}
+
 	playerBoard := newBoard(gridSize, totalShips, shipPositions)
 
 	moves, err := parseLocations(playerMoves)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(moves) != totalMissiles {
+		return nil, errors.New("Total missiles and Moves did not match")
 	}
 
 	return &player{
@@ -198,8 +207,8 @@ func newLocation(locData string) (location, error) {
 		return location{}, err
 	}
 	return location{
-		X: x,
-		Y: y,
+		x: x,
+		y: y,
 	}, nil
 }
 
@@ -215,7 +224,7 @@ func newBoard(gridSize, totalShips int, shipPositions []location) playerBoard {
 	}
 
 	for _, position := range shipPositions {
-		boardRepresentation[position.X][position.Y] = initialPosition
+		boardRepresentation[position.x][position.y] = initialPosition
 	}
 
 	return playerBoard{
@@ -246,10 +255,19 @@ type GameResult struct {
 //Total Missiles for each player - 5
 //Player1 moves on Player2 - 0:1,4:3,2:3,3:1,4:1
 //Player2 moves on Player1 - 0:1,0:0,1:2,2:3,4:3
-func PlayGame(gameData []string) (GameResult, error) {
+func PlayGame(gameData []string) (gameResult GameResult, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			var ok bool
+			err, ok = r.(error)
+			if !ok {
+				err = fmt.Errorf("pkg: %v", r)
+			}
+		}
+	}()
 	p1, p2, err := parsePlayers(gameData)
 	if err != nil {
-		return GameResult{}, nil
+		return
 	}
 	player1Hits := p2.getOpponentHits(p1.moves)
 	player2Hits := p1.getOpponentHits(p2.moves)
@@ -259,11 +277,13 @@ func PlayGame(gameData []string) (GameResult, error) {
 	} else if player2Hits > player1Hits {
 		result = "Player2 wins"
 	}
-	return GameResult{
+	gameResult = GameResult{
 		Player1Board: p1.board.String(),
 		Player2Board: p2.board.String(),
 		Player1Hits:  player1Hits,
 		Player2Hits:  player2Hits,
 		Result:       result,
-	}, nil
+	}
+
+	return
 }
