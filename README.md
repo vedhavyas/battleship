@@ -13,9 +13,9 @@ be given T number of missiles.
 
 ##Installation
 ```
-go get github.com/vedhavyas/battleship/battleship-start
+go get github.com/vedhavyas/battleship/cmd
 cd $GOPATH/bin
-./battleship-start --help
+./battleship --help
 ```
 
 ##Input
